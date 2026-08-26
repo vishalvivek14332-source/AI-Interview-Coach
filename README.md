@@ -278,12 +278,6 @@ The MetaHuman is streamed directly into the interview interface using Streampixe
 - Pixel Streaming
 - Streampixel
 
-### Visualization
-
-- Chart.js
-
----
-
 # 📋 Requirements
 
 - Python 3.10+
