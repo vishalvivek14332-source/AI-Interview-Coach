@@ -273,7 +273,7 @@ The MetaHuman is streamed directly into the interview interface using Streampixe
 
 ### 3D Interviewer
 
-- Unreal Engine 5.8 
+- Unreal Engine
 - MetaHuman
 - Pixel Streaming
 - Streampixel
