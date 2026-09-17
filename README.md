@@ -283,7 +283,7 @@ The MetaHuman is streamed directly into the interview interface using Streampixe
 - Python 3.10+
 - Google Chrome / Microsoft Edge
 - Microphone
-- Unreal Engine 5.8 (for MetaHuman development)
+- Unreal Engine 5.8 (for MetaHuman)
 - Streampixel Account (for cloud streaming)
 
 ---
