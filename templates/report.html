@@ -270,10 +270,13 @@ function toggleTheme() {
 const interviewId = window.location.pathname.split('/').pop();
 let reportData = null;
 
-// Read presence confidence from URL params (set by interview.js on finish)
-const _urlParams    = new URLSearchParams(window.location.search);
-const _presenceScore  = _urlParams.has('presence')  ? parseFloat(_urlParams.get('presence'))  : null;
-const _absenceCount   = _urlParams.has('absences')  ? parseInt(_urlParams.get('absences'), 10) : null;
+// Read presence & body-language metrics from URL params (set by interview.js on finish)
+const _urlParams     = new URLSearchParams(window.location.search);
+const _presenceScore = _urlParams.has('presence') ? parseFloat(_urlParams.get('presence')) : null;
+const _absenceCount  = _urlParams.has('absences') ? parseInt(_urlParams.get('absences'), 10) : null;
+const _gazeScore     = _urlParams.has('gaze')     ? parseFloat(_urlParams.get('gaze'))     : null;
+const _postureScore  = _urlParams.has('posture')  ? parseFloat(_urlParams.get('posture'))  : null;
+const _handScore     = _urlParams.has('hands')    ? parseFloat(_urlParams.get('hands'))    : null;
 
 async function loadReport() {
   try {
@@ -342,13 +345,13 @@ function renderReport(data) {
     </div>
   `).join('');
 
-  // Presence card — shown only when proctoring data is available
+  // Body language proctoring cards — shown only when metrics data is available
   let presenceCardHtml = '';
   if (_presenceScore !== null) {
     const pColor = _presenceScore >= 80 ? 'var(--success)' : _presenceScore >= 50 ? 'var(--warning)' : 'var(--danger)';
     const pLabel = _presenceScore >= 80 ? 'Excellent' : _presenceScore >= 50 ? 'Good' : 'Needs Review';
     presenceCardHtml = `
-    <div class="score-card" style="grid-column:1/-1;">
+    <div class="score-card">
       <div style="font-size:1.4rem;margin-bottom:0.4rem">👁️</div>
       <div class="big" style="background:${pColor};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
         ${_presenceScore.toFixed(1)}%
@@ -361,7 +364,61 @@ function renderReport(data) {
     </div>`;
   }
 
-  document.getElementById('scoreCards').innerHTML = baseCards + presenceCardHtml;
+  let gazeCardHtml = '';
+  if (_gazeScore !== null) {
+    const gColor = '#06b6d4';
+    const gLabel = _gazeScore >= 80 ? 'Excellent' : _gazeScore >= 50 ? 'Good' : 'Needs Review';
+    gazeCardHtml = `
+    <div class="score-card">
+      <div style="font-size:1.4rem;margin-bottom:0.4rem">👁️</div>
+      <div class="big" style="background:${gColor};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+        ${_gazeScore.toFixed(1)}%
+      </div>
+      <div class="label">Eye Contact</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">${gLabel}</div>
+      <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:8px;overflow:hidden;">
+        <div style="height:100%;width:${_gazeScore}%;background:${gColor};border-radius:2px;transition:width 1s ease;"></div>
+      </div>
+    </div>`;
+  }
+
+  let postureCardHtml = '';
+  if (_postureScore !== null) {
+    const posColor = '#f59e0b';
+    const posLabel = _postureScore >= 80 ? 'Excellent' : _postureScore >= 50 ? 'Good' : 'Needs Review';
+    postureCardHtml = `
+    <div class="score-card">
+      <div style="font-size:1.4rem;margin-bottom:0.4rem">🧍</div>
+      <div class="big" style="background:${posColor};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+        ${_postureScore.toFixed(1)}%
+      </div>
+      <div class="label">Posture</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">${posLabel}</div>
+      <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:8px;overflow:hidden;">
+        <div style="height:100%;width:${_postureScore}%;background:${posColor};border-radius:2px;transition:width 1s ease;"></div>
+      </div>
+    </div>`;
+  }
+
+  let handCardHtml = '';
+  if (_handScore !== null) {
+    const hColor = '#10b981';
+    const hLabel = _handScore >= 80 ? 'Excellent' : _handScore >= 50 ? 'Good' : 'Needs Review';
+    handCardHtml = `
+    <div class="score-card">
+      <div style="font-size:1.4rem;margin-bottom:0.4rem">✋</div>
+      <div class="big" style="background:${hColor};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+        ${_handScore.toFixed(1)}%
+      </div>
+      <div class="label">Hand Stillness</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">${hLabel}</div>
+      <div style="height:4px;background:var(--bg3);border-radius:2px;margin-top:8px;overflow:hidden;">
+        <div style="height:100%;width:${_handScore}%;background:${hColor};border-radius:2px;transition:width 1s ease;"></div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('scoreCards').innerHTML = baseCards + presenceCardHtml + gazeCardHtml + postureCardHtml + handCardHtml;
 
   // Score bars (dimension averages from responses)
   const dims = [

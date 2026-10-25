@@ -84,7 +84,16 @@ def index():
 
 @app.route('/interview')
 def interview():
-    return render_template('interview.html')
+    signalling_port = os.environ.get('PIXEL_STREAMING_PLAYER_PORT', '80')
+    signalling_url = os.environ.get('METAHUMAN_SIGNALLING_URL', f'ws://127.0.0.1:{signalling_port}')
+    default_stream_url = f'http://127.0.0.1:{signalling_port}/uiless.html?AutoConnect=true&AutoPlayAudio=true&HoveringMouse=true'
+    stream_url = os.environ.get('METAHUMAN_STREAM_URL', default_stream_url)
+    return render_template(
+        'interview.html',
+        stream_url=stream_url,
+        signalling_port=signalling_port,
+        signalling_url=signalling_url,
+    )
 
 
 @app.route('/report/<int:interview_id>')

@@ -307,11 +307,17 @@ const Avatar = (() => {
     utter.onstart = () => {
       _isSpeaking = true;
       setTalking(true);
+      if (window.MetaHuman?.sendToMetaHuman) {
+        window.MetaHuman.sendToMetaHuman({ type: 'speak', text });
+      }
     };
 
     utter.onend = () => {
       _isSpeaking = false;
       setTalking(false);
+      if (window.MetaHuman?.sendToMetaHuman) {
+        window.MetaHuman.sendToMetaHuman({ type: 'stop' });
+      }
       if (onEndCb) onEndCb();
     };
 
@@ -321,6 +327,9 @@ const Avatar = (() => {
       console.warn('[avatar.js] SpeechSynthesis error:', event.error);
       _isSpeaking = false;
       setTalking(false);
+      if (window.MetaHuman?.sendToMetaHuman) {
+        window.MetaHuman.sendToMetaHuman({ type: 'stop' });
+      }
       if (onEndCb) onEndCb();
     };
 
@@ -344,6 +353,9 @@ const Avatar = (() => {
     }
     _isSpeaking = false;
     setTalking(false);
+    if (window.MetaHuman?.sendToMetaHuman) {
+      window.MetaHuman.sendToMetaHuman({ type: 'stop' });
+    }
     _utterance = null;
   }
 

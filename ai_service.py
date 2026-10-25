@@ -29,12 +29,18 @@ from typing import Optional
 
 import requests
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-_API_KEY   = os.environ.get('GEMINI_API_KEY', '')
+_API_KEY   = os.environ.get('GEMINI_API_KEY', '') or os.environ.get('GCP_API_KEY', '')
 _MODEL     = 'gemini-2.5-flash'
 _API_URL   = f'https://generativelanguage.googleapis.com/v1beta/models/{_MODEL}:generateContent'
 _MAX_RETRIES  = 3

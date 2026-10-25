@@ -129,32 +129,43 @@ AI_Interview_Coach/
 ├── email_service.py
 ├── requirements.txt
 ├── database.db
+├── METAHUMAN_DEPLOYMENT.md
+├── metahuman.uproject
+├── MyProject4.uproject
 
 ├── models/
 │   └── __init__.py
 
+├── pixel_streaming/
+│   ├── signalling_server.py
+│   └── www/
+
+├── scripts/
+│   ├── run_metahuman_standalone.bat
+│   ├── run_metahuman_standalone.ps1
+│   ├── package_metahuman.bat
+│   └── stop_metahuman.bat
+
 ├── static/
 │   ├── css/
 │   │   └── style.css
-│   ├── images/
-│   └── js/
-│       ├── main.js
-│       ├── interview.js
-│       ├── body_language.js
-│       ├── speech.js
-│       └── avatar.js
+│   ├── js/
+│   │   ├── main.js
+│   │   ├── interview.js
+│   │   ├── avatar.js
+│   │   ├── metahuman.js
+│   │   └── proctor.js
+│   ├── models/
+│   │   └── face_landmarker.task
+│   └── vendor/
+│       └── mediapipe/
 
-├── templates/
-│   ├── index.html
-│   ├── interview.html
-│   ├── dashboard.html
-│   ├── report.html
-│   └── certificate.html
-
-├── uploads/
-
-└── Unreal/
-    └── MetaHuman Project
+└── templates/
+    ├── index.html
+    ├── interview.html
+    ├── dashboard.html
+    ├── report.html
+    └── about.html
 ```
 
 ---
@@ -164,9 +175,9 @@ AI_Interview_Coach/
 ## Clone Repository
 
 ```bash
-git clone https://github.com/vishalvivek14332-source/AI-Interview-Coach-.git
+git clone https://github.com/vishalvivek14332-source/AI-Interview-Coach.git
 
-cd AI-Interview-Coach-
+cd AI-Interview-Coach
 ```
 
 ---

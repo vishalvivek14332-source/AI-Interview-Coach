@@ -860,13 +860,22 @@ async function finishInterview() {
   if (typeof stopSpeaking === 'function') stopSpeaking();
   if (_isRecording) _stopRecording();
 
-  // Collect presence data BEFORE stopping the proctor (stopProctor finalises the log).
+  // Collect presence and body-language metrics BEFORE stopping the proctor (stopProctor finalises logs).
   const presenceScore = (typeof window.getPresenceScore === 'function')
     ? window.getPresenceScore()
     : null;
   const absenceLog = (typeof window.getAbsenceLog === 'function')
     ? window.getAbsenceLog()
     : [];
+  const gazeScore = (typeof window.getGazeScore === 'function')
+    ? window.getGazeScore()
+    : null;
+  const postureScore = (typeof window.getPostureScore === 'function')
+    ? window.getPostureScore()
+    : null;
+  const handScore = (typeof window.getHandStillnessScore === 'function')
+    ? window.getHandStillnessScore()
+    : null;
 
   // Stop webcam / detection loop now that the interview is over.
   if (typeof window.stopProctor === 'function') window.stopProctor();
@@ -881,6 +890,9 @@ async function finishInterview() {
         presence_score:  presenceScore,   // percentage 0-100
         absence_count:   absenceLog.length,
         absence_log:     absenceLog,      // array of { start, end, durationMs }
+        gaze_score:      gazeScore,
+        posture_score:   postureScore,
+        hand_score:      handScore,
       }),
     });
 
@@ -898,11 +910,26 @@ async function finishInterview() {
     return;
   }
 
-  // Build presence card HTML (shown only when proctoring ran)
+  // Build body-language score cards HTML (shown only when proctoring ran)
   const presenceCardHtml = (presenceScore !== null) ? `
       <div class="c-score">
         <div class="v" style="font-size:1.4rem;">${presenceScore}%</div>
         <div class="l">Presence Score</div>
+      </div>` : '';
+  const gazeCardHtml = (gazeScore !== null) ? `
+      <div class="c-score">
+        <div class="v" style="font-size:1.4rem;">${gazeScore}%</div>
+        <div class="l">Eye Contact</div>
+      </div>` : '';
+  const postureCardHtml = (postureScore !== null) ? `
+      <div class="c-score">
+        <div class="v" style="font-size:1.4rem;">${postureScore}%</div>
+        <div class="l">Posture</div>
+      </div>` : '';
+  const handCardHtml = (handScore !== null) ? `
+      <div class="c-score">
+        <div class="v" style="font-size:1.4rem;">${handScore}%</div>
+        <div class="l">Hand Stillness</div>
       </div>` : '';
 
   // Populate the completion overlay score cards.
@@ -927,10 +954,13 @@ async function finishInterview() {
         <div class="l">Confidence</div>
       </div>
       ${presenceCardHtml}
+      ${gazeCardHtml}
+      ${postureCardHtml}
+      ${handCardHtml}
     `;
   }
 
-  // Store presence score on window for the report page to read if needed.
+  // Store metrics on window for the report page to read if needed.
   window._lastPresenceScore = presenceScore;
   window._lastAbsenceLog    = absenceLog;
 
@@ -938,8 +968,15 @@ async function finishInterview() {
   const reportBtn = $id('viewReportBtn');
   if (reportBtn) {
     reportBtn.onclick = () => {
-      // Pass presence score as a query param so report.html can display it
-      const qs = presenceScore !== null ? `?presence=${presenceScore}&absences=${absenceLog.length}` : '';
+      // Pass metrics as query params so report.html can display them
+      const urlParams = new URLSearchParams();
+      if (presenceScore !== null) urlParams.set('presence', presenceScore);
+      if (absenceLog !== null) urlParams.set('absences', absenceLog.length);
+      if (gazeScore !== null) urlParams.set('gaze', gazeScore);
+      if (postureScore !== null) urlParams.set('posture', postureScore);
+      if (handScore !== null) urlParams.set('hands', handScore);
+
+      const qs = urlParams.toString() ? `?${urlParams.toString()}` : '';
       window.location.href = `/report/${_interviewId}${qs}`;
     };
   }

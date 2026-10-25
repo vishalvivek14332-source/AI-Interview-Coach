@@ -255,6 +255,9 @@
       font-weight: 400;
     }
 
+    #stageFallback {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -291,90 +294,166 @@
   <!-- LEFT COLUMN -->
   <div style="display:flex;flex-direction:column;gap:1.2rem">
 
-    <!-- Avatar Panel -->
-    <div class="avatar-panel">
-      <!-- Progress bar at top -->
-      <div class="progress-wrap" style="margin-bottom:1.2rem">
-        <div class="progress-label">
-          <span>Interview Progress</span>
-          <span id="progressText">Question 0 of 10</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    <!-- Interview Stage — metahuman-ready -->
+    <div class="stage-panel" id="stagePanel">
+
+      <!-- Status chip + progress -->
+      <div class="stage-topbar">
+        <div class="stage-chip" id="stageChip"><span class="chip-dot"></span>AI Interviewer</div>
+        <div class="stage-progress">
+          <div class="progress-label">
+            <span>Interview Progress</span>
+            <span id="progressText">Question 0 of 10</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Avatar + speech -->
-      <div style="display:flex;align-items:flex-start;gap:1.4rem">
-        <div class="avatar-wrapper" style="flex-shrink:0">
-          <div class="avatar-ring" id="avatarRing"></div>
-          <!-- Inline SVG avatar -->
-          <svg class="avatar-svg" id="avatarSvg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <radialGradient id="skinGrad" cx="50%" cy="40%" r="60%">
-                <stop offset="0%" stop-color="#a78bfa"/>
-                <stop offset="100%" stop-color="#6366f1"/>
-              </radialGradient>
-              <radialGradient id="bgGrad" cx="50%" cy="50%" r="60%">
-                <stop offset="0%" stop-color="#1e1b4b"/>
-                <stop offset="100%" stop-color="#0f172a"/>
-              </radialGradient>
-            </defs>
-            <!-- Background -->
-            <circle cx="80" cy="80" r="80" fill="url(#bgGrad)"/>
-            <!-- Body/shirt -->
-            <ellipse cx="80" cy="148" rx="44" ry="30" fill="#312e81"/>
-            <rect x="58" y="125" width="44" height="30" rx="4" fill="#4338ca"/>
-            <!-- Collar -->
-            <polygon points="80,122 70,140 80,135 90,140" fill="#e0e7ff"/>
-            <!-- Head -->
-            <ellipse cx="80" cy="80" rx="38" ry="42" fill="url(#skinGrad)"/>
-            <!-- Ear waves (TTS indicator) -->
-            <rect id="earL" class="av-ear-wave" x="36" y="72" width="5" height="16" rx="2" fill="#8b5cf6" transform-origin="38px 80px"/>
-            <rect id="earR" class="av-ear-wave" x="119" y="72" width="5" height="16" rx="2" fill="#8b5cf6" transform-origin="122px 80px" style="animation-delay:0.15s"/>
-            <!-- Eyes -->
-            <ellipse class="av-eye" cx="65" cy="76" rx="7" ry="6" fill="#fff"/>
-            <ellipse class="av-eye" cx="95" cy="76" rx="7" ry="6" fill="#fff" style="animation-delay:0.1s"/>
-            <circle cx="66" cy="77" r="3.5" fill="#1e1b4b"/>
-            <circle cx="96" cy="77" r="3.5" fill="#1e1b4b"/>
-            <circle cx="67" cy="76" r="1.2" fill="#fff"/>
-            <circle cx="97" cy="76" r="1.2" fill="#fff"/>
-            <!-- Eyebrows -->
-            <path d="M57 67 Q65 63 73 67" stroke="#4c1d95" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M87 67 Q95 63 103 67" stroke="#4c1d95" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <!-- Nose -->
-            <ellipse cx="80" cy="90" rx="4" ry="3" fill="rgba(76,29,149,0.3)"/>
-            <!-- Mouth -->
-            <path id="avatarMouth" class="av-mouth-line" d="M68 105 Q80 112 92 105" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <!-- Hair -->
-            <path d="M42 65 Q48 28 80 26 Q112 28 118 65 Q108 48 80 46 Q52 48 42 65Z" fill="#312e81"/>
-            <!-- Glasses -->
-            <rect x="55" y="70" width="24" height="16" rx="6" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
-            <rect x="81" y="70" width="24" height="16" rx="6" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
-            <line x1="79" y1="78" x2="81" y2="78" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
-          </svg>
-        </div>
+      <!-- Stage frame: reserved space for the digital-human render -->
+      <div class="stage-frame" id="metahumanStage">
+        <!--
+          Mount point for the MetaHuman / digital-human interface.
+          Attach a <video>, <canvas>, or pixel-streaming <iframe> here —
+          it fills the stage automatically and takes over from the
+          fallback avatar below. Leave empty to keep the fallback.
+        -->
+        <div class="metahuman-slot" id="metahumanSlot">
+          <iframe
+              id="metahumanFrame"
+              src="{{ stream_url }}"
+              title="Unreal Engine MetaHuman Live Stream"
+              width="100%"
+              height="100%"
+              frameborder="0"
+              allow="camera; microphone; autoplay; fullscreen; display-capture"
+              allowfullscreen
+              class="metahuman-iframe">
+          </iframe>
 
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.6rem">
-            <div style="font-size:0.8rem;font-weight:600;color:var(--accent)">AI Interviewer</div>
-            <div class="tts-wave" id="ttsWave">
-              <span></span><span></span><span></span><span></span><span></span>
+          <!-- Stream Loading Indicator Overlay -->
+          <div class="metahuman-overlay" id="metahumanLoading">
+            <div class="mh-spinner-ring"></div>
+            <div class="mh-status-title">Connecting to MetaHuman Stream</div>
+            <div class="mh-status-sub" id="metahumanLoadingSub">Establishing WebRTC connection with Unreal Engine...</div>
+          </div>
+
+          <!-- Stream Offline / Error Diagnostics Overlay -->
+          <div class="metahuman-overlay mh-offline-overlay" id="metahumanOffline" style="display:none">
+            <div class="mh-offline-card">
+              <div class="mh-offline-icon">📡</div>
+              <h3 class="mh-offline-title">MetaHuman Stream Offline</h3>
+              <p class="mh-offline-desc" id="metahumanOfflineDesc">
+                Waiting for Unreal Engine project (<code>MyProject4</code>) to stream the MetaHuman scene.
+              </p>
+
+              <!-- Diagnostic status pills -->
+              <div class="mh-diag-pills">
+                <div class="mh-diag-pill" id="diagSignallingPill">
+                  <span class="mh-diag-dot" id="diagSignallingDot"></span>
+                  <span id="diagSignallingText">Signalling Server: Checking...</span>
+                </div>
+                <div class="mh-diag-pill" id="diagStreamerPill">
+                  <span class="mh-diag-dot" id="diagStreamerDot"></span>
+                  <span id="diagStreamerText">Unreal Streamer: Waiting</span>
+                </div>
+              </div>
+
+              <!-- Quick action buttons -->
+              <div class="mh-offline-actions">
+                <button type="button" class="btn-mh-reconnect" id="btnReconnectStream" onclick="MetaHuman.reconnect()">
+                  🔄 Reconnect Stream
+                </button>
+                <button type="button" class="btn-mh-fallback" id="btnUseFallback" onclick="MetaHuman.switchToFallback()">
+                  Use 2D Avatar Instead
+                </button>
+              </div>
+
+              <!-- Startup guidance hint -->
+              <div class="mh-offline-hint">
+                💡 <strong>Quick Launch:</strong> Run <code>scripts\run_metahuman_standalone.bat</code> or in Unreal Editor click <strong>Play (Alt+P)</strong>.
+              </div>
             </div>
           </div>
-          <div class="speech-bubble" id="speechBubble">
-            <span id="bubbleText">Getting your interview ready…</span>
+        </div>
+
+        <!-- Fallback avatar — shown when toggled or fallback chosen -->
+        <div class="stage-fallback" id="stageFallback" style="display:none">
+          <div class="avatar-wrapper">
+            <div class="avatar-ring" id="avatarRing"></div>
+            <!-- Inline SVG avatar -->
+            <svg class="avatar-svg" id="avatarSvg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="skinGrad" cx="50%" cy="40%" r="60%">
+                  <stop offset="0%" stop-color="#a78bfa"/>
+                  <stop offset="100%" stop-color="#6366f1"/>
+                </radialGradient>
+                <radialGradient id="bgGrad" cx="50%" cy="50%" r="60%">
+                  <stop offset="0%" stop-color="#1e1b4b"/>
+                  <stop offset="100%" stop-color="#0f172a"/>
+                </radialGradient>
+              </defs>
+              <!-- Background -->
+              <circle cx="80" cy="80" r="80" fill="url(#bgGrad)"/>
+              <!-- Body/shirt -->
+              <ellipse cx="80" cy="148" rx="44" ry="30" fill="#312e81"/>
+              <rect x="58" y="125" width="44" height="30" rx="4" fill="#4338ca"/>
+              <!-- Collar -->
+              <polygon points="80,122 70,140 80,135 90,140" fill="#e0e7ff"/>
+              <!-- Head -->
+              <ellipse cx="80" cy="80" rx="38" ry="42" fill="url(#skinGrad)"/>
+              <!-- Ear waves (TTS indicator) -->
+              <rect id="earL" class="av-ear-wave" x="36" y="72" width="5" height="16" rx="2" fill="#8b5cf6" transform-origin="38px 80px"/>
+              <rect id="earR" class="av-ear-wave" x="119" y="72" width="5" height="16" rx="2" fill="#8b5cf6" transform-origin="122px 80px" style="animation-delay:0.15s"/>
+              <!-- Eyes -->
+              <ellipse class="av-eye" cx="65" cy="76" rx="7" ry="6" fill="#fff"/>
+              <ellipse class="av-eye" cx="95" cy="76" rx="7" ry="6" fill="#fff" style="animation-delay:0.1s"/>
+              <circle cx="66" cy="77" r="3.5" fill="#1e1b4b"/>
+              <circle cx="96" cy="77" r="3.5" fill="#1e1b4b"/>
+              <circle cx="67" cy="76" r="1.2" fill="#fff"/>
+              <circle cx="97" cy="76" r="1.2" fill="#fff"/>
+              <!-- Eyebrows -->
+              <path d="M57 67 Q65 63 73 67" stroke="#4c1d95" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M87 67 Q95 63 103 67" stroke="#4c1d95" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <!-- Nose -->
+              <ellipse cx="80" cy="90" rx="4" ry="3" fill="rgba(76,29,149,0.3)"/>
+              <!-- Mouth -->
+              <path id="avatarMouth" class="av-mouth-line" d="M68 105 Q80 112 92 105" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <!-- Hair -->
+              <path d="M42 65 Q48 28 80 26 Q112 28 118 65 Q108 48 80 46 Q52 48 42 65Z" fill="#312e81"/>
+              <!-- Glasses -->
+              <rect x="55" y="70" width="24" height="16" rx="6" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+              <rect x="81" y="70" width="24" height="16" rx="6" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+              <line x1="79" y1="78" x2="81" y2="78" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+            </svg>
           </div>
-          <div style="margin-top:0.6rem;display:flex;align-items:center;gap:0.6rem">
-            <button onclick="replayTTS()" style="font-size:0.75rem;color:var(--muted);background:none;border:none;padding:0;display:flex;align-items:center;gap:4px">
-              🔊 Replay question
-            </button>
-            <span style="color:var(--border)">·</span>
-            <div id="qTimer" style="font-family:var(--mono);font-size:0.8rem;color:var(--accent3)">00:00</div>
+          <div class="stage-fallback-note">
+            <span>2D Fallback Avatar is active.</span>
+            <button type="button" class="btn-return-mh" onclick="MetaHuman.reconnect()">Switch to Unreal MetaHuman</button>
           </div>
+        </div>
+
+        <!-- Speaking indicator, overlaid on the stage -->
+        <div class="tts-wave stage-wave" id="ttsWave">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Caption strip -->
+      <div class="stage-caption">
+        <div class="stage-caption-label">Current Question</div>
+        <div class="speech-bubble" id="speechBubble">
+          <span id="bubbleText">Getting your interview ready…</span>
+        </div>
+        <div class="stage-meta-row">
+          <button onclick="replayTTS()">🔊 Replay question</button>
+          <span style="color:var(--border)">·</span>
+          <div id="qTimer" style="font-family:var(--mono);font-size:0.8rem;color:var(--accent3)">00:00</div>
         </div>
       </div>
     </div>
+
 
     <!-- Question card -->
     <div class="question-card" id="questionCard" style="display:none">
@@ -468,6 +547,36 @@
           <div id="proctorPresenceBar" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width 0.6s ease;"></div>
         </div>
       </div>
+      <!-- Eye contact / gaze score -->
+      <div style="padding:0.5rem 1rem 0;background:var(--bg2);">
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:4px;">
+          <span>Eye Contact</span>
+          <span id="proctorGazeScore" style="font-family:var(--mono);font-weight:700;color:#06b6d4;">—</span>
+        </div>
+        <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;">
+          <div id="proctorGazeBar" style="height:100%;width:0%;border-radius:3px;background:#06b6d4;transition:width 0.6s ease;"></div>
+        </div>
+      </div>
+      <!-- Posture score -->
+      <div style="padding:0.5rem 1rem 0;background:var(--bg2);">
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:4px;">
+          <span>Posture</span>
+          <span id="proctorPostureScore" style="font-family:var(--mono);font-weight:700;color:#f59e0b;">—</span>
+        </div>
+        <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;">
+          <div id="proctorPostureBar" style="height:100%;width:0%;border-radius:3px;background:#f59e0b;transition:width 0.6s ease;"></div>
+        </div>
+      </div>
+      <!-- Hand stillness score -->
+      <div style="padding:0.5rem 1rem 0.55rem;background:var(--bg2);">
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--muted);margin-bottom:4px;">
+          <span>Hand Stillness</span>
+          <span id="proctorHandScore" style="font-family:var(--mono);font-weight:700;color:#10b981;">—</span>
+        </div>
+        <div style="height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;">
+          <div id="proctorHandBar" style="height:100%;width:0%;border-radius:3px;background:#10b981;transition:width 0.6s ease;"></div>
+        </div>
+      </div>
       <div class="proctor-footer">🔒 On-device only · Pauses after 3 s · No video uploaded</div>
     </div>
 
@@ -517,10 +626,16 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection@0.4/face_detection.js" crossorigin="anonymous"></script>
+<script>
+  // MetaHuman Pixel Streaming configuration
+  window.METAHUMAN_STREAM_URL = "{{ stream_url }}";
+  window.METAHUMAN_SIGNALLING_URL = "{{ signalling_url }}";
+  window.METAHUMAN_STATUS_URL = "http://127.0.0.1:{{ signalling_port }}/api/status";
+</script>
 <script src="/static/js/proctor.js"></script>
 <script src="/static/js/main.js"></script>
 <script src="/static/js/avatar.js"></script>
+<script src="/static/js/metahuman.js"></script>
 <script src="/static/js/interview.js"></script>
 </body>
 </html>

@@ -291,15 +291,227 @@ footer {
 .interview-main { display: flex; flex-direction: column; gap: 1.2rem; }
 .interview-sidebar { display: flex; flex-direction: column; gap: 1.2rem; }
 
-/* Avatar Panel */
-.avatar-panel {
+/* ═══════════════════════════════════════════════════════
+   INTERVIEW STAGE — metahuman-ready
+   Reserved: #metahumanSlot is an empty mount point for a
+   MetaHuman / digital-human render (video, WebGL canvas, or
+   pixel-streaming iframe). Until something is mounted into it,
+   the SVG avatar renders as a fallback inside #stageFallback.
+   ═══════════════════════════════════════════════════════ */
+.stage-panel {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem;
-  text-align: center;
-  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
 }
+.stage-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.2rem; padding: 0.9rem 1.3rem;
+  border-bottom: 1px solid var(--border);
+}
+.stage-chip {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.01em;
+  color: var(--accent3);
+  background: rgba(6,182,212,0.08);
+  border: 1px solid rgba(6,182,212,0.28);
+  padding: 0.4rem 0.75rem; border-radius: 999px;
+  white-space: nowrap;
+}
+.chip-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent3); box-shadow: 0 0 8px var(--accent3);
+  animation: chipPulse 1.8s ease-in-out infinite;
+}
+@keyframes chipPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.stage-progress { flex: 1; max-width: 320px; }
+.stage-progress .progress-label { margin-bottom: 4px; }
+
+.stage-frame {
+  position: relative;
+  min-height: 340px;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(99,102,241,0.16), transparent 55%),
+    radial-gradient(circle at 75% 85%, rgba(6,182,212,0.10), transparent 50%),
+    var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+/* Reserved mount point for the MetaHuman / digital-human render.
+   Wire your video element, <canvas>, or streaming <iframe> into
+   #metahumanSlot — it fills the whole stage and sits above the
+   fallback avatar. */
+.metahuman-slot {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  z-index: 2;
+}
+.metahuman-slot.hidden { display: none !important; }
+.metahuman-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000;
+  display: block;
+  border-radius: 16px;
+}
+
+/* Overlays */
+.metahuman-overlay {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(15,23,42,0.92) 0%, rgba(5,8,16,0.98) 100%);
+  backdrop-filter: blur(8px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 10;
+  padding: 1.5rem;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.metahuman-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.mh-spinner-ring {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(6,182,212,0.2);
+  border-top-color: var(--accent3, #06b6d4);
+  border-right-color: var(--accent, #6366f1);
+  border-radius: 50%;
+  animation: mhSpin 0.9s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+  margin-bottom: 1rem;
+}
+@keyframes mhSpin {
+  to { transform: rotate(360deg); }
+}
+.mh-status-title {
+  font-size: 1rem; font-weight: 700; color: #fff;
+  letter-spacing: 0.02em; margin-bottom: 0.3rem;
+}
+.mh-status-sub {
+  font-size: 0.8rem; color: var(--muted, #94a3b8);
+  text-align: center; max-width: 340px;
+}
+
+/* Offline Diagnostics Card */
+.mh-offline-card {
+  max-width: 440px; width: 100%;
+  background: rgba(15,23,42,0.88);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.5);
+  border-radius: 16px;
+  padding: 1.6rem;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+}
+.mh-offline-icon {
+  font-size: 2.2rem; margin-bottom: 0.6rem;
+}
+.mh-offline-title {
+  font-size: 1.15rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.4rem;
+}
+.mh-offline-desc {
+  font-size: 0.82rem; color: #94a3b8; line-height: 1.45; margin-bottom: 1.1rem;
+}
+.mh-offline-desc code {
+  color: #38bdf8; background: rgba(56,189,248,0.1); padding: 2px 6px; border-radius: 4px;
+}
+.mh-diag-pills {
+  display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 1.2rem; width: 100%;
+}
+.mh-diag-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(30,41,59,0.7);
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 0.35rem 0.7rem; border-radius: 999px;
+  color: #cbd5e1;
+}
+.mh-diag-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #f59e0b;
+}
+.mh-diag-dot.online {
+  background: #10b981; box-shadow: 0 0 6px #10b981;
+}
+.mh-diag-dot.offline {
+  background: #ef4444; box-shadow: 0 0 6px #ef4444;
+}
+.mh-offline-actions {
+  display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; width: 100%; margin-bottom: 0.8rem;
+}
+.btn-mh-reconnect {
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  color: #fff; font-weight: 600; font-size: 0.82rem;
+  border: none; border-radius: 8px; padding: 0.55rem 1rem;
+  cursor: pointer; transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+}
+.btn-mh-reconnect:hover {
+  transform: translateY(-1px); opacity: 0.95;
+}
+.btn-mh-fallback {
+  background: rgba(255,255,255,0.06);
+  color: #94a3b8; font-weight: 600; font-size: 0.82rem;
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.55rem 0.9rem;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.btn-mh-fallback:hover {
+  color: #fff; background: rgba(255,255,255,0.1);
+}
+.mh-offline-hint {
+  font-size: 0.72rem; color: #64748b; line-height: 1.4;
+  border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem; margin-top: 0.2rem;
+  width: 100%;
+}
+.mh-offline-hint code {
+  color: #a5b4fc; background: rgba(99,102,241,0.1); padding: 2px 4px; border-radius: 4px;
+}
+.btn-return-mh {
+  display: inline-block; margin-top: 6px;
+  background: rgba(6,182,212,0.12); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3);
+  padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-return-mh:hover {
+  background: rgba(6,182,212,0.22); color: #fff;
+}
+
+.stage-fallback {
+  display: flex; flex-direction: column; align-items: center; gap: 0.9rem;
+  padding: 2rem;
+}
+.stage-fallback.hidden { display: none; }
+.stage-fallback .avatar-wrapper { width: 190px; height: 190px; margin: 0; }
+.stage-fallback-note {
+  font-size: 0.72rem; color: var(--muted); text-align: center; max-width: 260px;
+  opacity: 0.75;
+}
+
+.stage-wave {
+  position: absolute; right: 1.1rem; bottom: 1.1rem;
+  background: rgba(10,14,26,0.55); backdrop-filter: blur(6px);
+  border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+}
+
+.stage-caption {
+  padding: 1.1rem 1.3rem 1.3rem;
+  border-top: 1px solid var(--border);
+}
+.stage-caption-label {
+  font-size: 0.8rem; font-weight: 600; color: var(--accent); margin-bottom: 0.5rem;
+}
+.stage-meta-row {
+  margin-top: 0.6rem; display: flex; align-items: center; gap: 0.6rem;
+}
+.stage-meta-row button {
+  font-size: 0.75rem; color: var(--muted); background: none; border: none;
+  padding: 0; display: flex; align-items: center; gap: 4px; cursor: pointer;
+}
+.stage-meta-row button:hover { color: var(--accent3); }
+
 .avatar-wrapper {
   width: 160px; height: 160px;
   margin: 0 auto 1.5rem;
@@ -315,13 +527,13 @@ footer {
 }
 .avatar-ring.talking { animation: avatarPulse 0.5s ease-in-out infinite alternate; }
 .avatar-svg {
-  width: 160px; height: 160px;
+  width: 100%; height: 100%;
   border-radius: 50%;
   overflow: hidden;
   position: relative; z-index: 1;
 }
 
-/* Speech bubble */
+/* Speech bubble (used inside the stage caption strip) */
 .speech-bubble {
   background: var(--bg2);
   border: 1px solid var(--border);

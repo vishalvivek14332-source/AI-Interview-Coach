@@ -1,3 +1,27 @@
-
+# Environment & Virtual Environments
 .env
 .venv/
+env/
+venv/
+ENV/
+
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Unreal Engine Build Artifacts and Caches
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+*.VC.db
+*.sln
+
+# Temporary & Archive Files
+pixel_streaming_infra.zip
+interview_coach.db
+*.log
